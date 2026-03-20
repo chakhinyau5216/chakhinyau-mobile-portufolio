@@ -1,31 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, Calendar, Smartphone, ChevronDown, ChevronLeft, ChevronRight, Images } from "lucide-react";
 import { studios } from "@/data/portfolio";
 import { getScreenshots } from "@/data/appScreenshots";
 
-// Sort: Unicorn first (2024-2025), then rest reversed (newest first)
-const unicorn = studios.find((s) => s.id === "unicorn")!;
-const rest = studios.filter((s) => s.id !== "unicorn").reverse();
-const orderedStudios = [unicorn, ...rest];
-
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.15 },
-  },
-};
-
-const companyVariants = {
-  hidden: { opacity: 0, y: 60, filter: "blur(8px)", scale: 0.92 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    scale: 1,
-    transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const },
-  },
-};
+// Order matches `studios` in portfolio: (1) Unicorn → (2) HKTDC → (3) Joynow → …
+const orderedStudios = studios;
 
 const cardVariants = {
   hidden: { opacity: 0, y: 24, scale: 0.94 },
@@ -41,52 +21,42 @@ const cardVariants = {
   }),
 };
 
+const screenshotGridClass = (n: number) => {
+  if (n <= 1) return "grid-cols-1";
+  if (n === 2) return "grid-cols-2";
+  if (n === 3) return "grid-cols-3";
+  if (n === 4) return "grid-cols-2 grid-rows-2";
+  return "grid-cols-3 auto-rows-fr"; /* 5+ images: 3 columns, wrap */
+};
+
 const AppCardHeader = ({ app }: { app: import("@/data/portfolio").AppItem }) => {
   const screenshots = getScreenshots(app.screenshots);
-  const [currentIdx, setCurrentIdx] = useState(0);
   const appIcon = `https://play-lh.googleusercontent.com/icon?id=${app.playStoreId}`;
 
   if (screenshots.length > 0) {
+    const n = screenshots.length;
+    const many = n > 4;
     return (
-      <div className="relative h-48 bg-gradient-to-br from-secondary to-muted overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={currentIdx}
-            src={screenshots[currentIdx]}
-            alt={`${app.name} screenshot ${currentIdx + 1}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="w-full h-full object-cover"
-          />
-        </AnimatePresence>
-        {/* Navigation dots & arrows */}
-        <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center gap-2 z-10">
-          <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCurrentIdx((p) => (p - 1 + screenshots.length) % screenshots.length); }}
-            className="w-6 h-6 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center hover:bg-background/90 transition-colors"
-          >
-            <ChevronLeft className="w-3 h-3 text-foreground" />
-          </button>
-          <div className="flex gap-1">
-            {screenshots.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCurrentIdx(idx); }}
-                className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentIdx ? "bg-primary w-3" : "bg-foreground/30"}`}
-              />
-            ))}
-          </div>
-          <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCurrentIdx((p) => (p + 1) % screenshots.length); }}
-            className="w-6 h-6 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center hover:bg-background/90 transition-colors"
-          >
-            <ChevronRight className="w-3 h-3 text-foreground" />
-          </button>
+      <div
+        className={`relative bg-gradient-to-br from-secondary to-muted overflow-hidden ${
+          many ? "min-h-52 max-h-64 overflow-y-auto" : "h-48"
+        }`}
+      >
+        <div
+          className={`grid w-full gap-0.5 ${screenshotGridClass(n)} ${
+            many ? "min-h-full" : "h-full"
+          }`}
+        >
+          {screenshots.map((src, idx) => (
+            <img
+              key={idx}
+              src={src}
+              alt={`${app.name} screenshot ${idx + 1}`}
+              className="w-full h-full min-h-0 object-cover"
+            />
+          ))}
         </div>
-        {/* Screenshot badge */}
-        <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-background/60 backdrop-blur-sm text-[9px] text-foreground/70">
+        <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-background/60 backdrop-blur-sm text-[9px] text-foreground/70 pointer-events-none">
           <Images className="w-2.5 h-2.5" />
           {screenshots.length}
         </div>
@@ -119,15 +89,45 @@ const AppCardHeader = ({ app }: { app: import("@/data/portfolio").AppItem }) => 
 };
 
 const TimelineWorkHistory = () => {
+  const [selectedApp, setSelectedApp] = useState<{
+    name: string;
+    screenshots: string[];
+    technicalNote?: string;
+  } | null>(null);
+  const [modalIdx, setModalIdx] = useState(0);
+
+  useEffect(() => {
+    if (!selectedApp) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSelectedApp(null);
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        setModalIdx((prev) => (prev - 1 + selectedApp.screenshots.length) % selectedApp.screenshots.length);
+      }
+
+      if (event.key === "ArrowRight") {
+        setModalIdx((prev) => (prev + 1) % selectedApp.screenshots.length);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedApp]);
+
   return (
-    <motion.section
-      id="work-history"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.5 }}
-      className="mb-16"
-    >
+    <>
+      <motion.section
+        id="work-history"
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.08, margin: "0px 0px 25% 0px" }}
+        transition={{ duration: 0.45 }}
+        className="mb-16 scroll-mt-24"
+      >
       <div className="sticky top-14 z-10 bg-background/80 backdrop-blur-md py-4 mb-12 text-center">
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
@@ -138,7 +138,7 @@ const TimelineWorkHistory = () => {
           Work History
         </motion.h2>
         <p className="text-sm text-muted-foreground mt-1">
-          6 studios · 12 years · 24+ published apps
+          6 studios · 12 years · 23+ published apps
         </p>
       </div>
 
@@ -210,16 +210,18 @@ const TimelineWorkHistory = () => {
         </div>
       </motion.div>
 
-      {/* Detailed company sections */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-        className="space-y-20"
-      >
+      {/* Detailed company sections — animate each block independently so content never stays opacity:0 if parent whileInView misses */}
+      <div className="space-y-20">
         {orderedStudios.map((studio) => (
-          <motion.div key={studio.id} id={`company-${studio.id}`} variants={companyVariants}>
+          <motion.div
+            key={studio.id}
+            id={`company-${studio.id}`}
+            className="scroll-mt-24"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.08, margin: "0px 0px 15% 0px" }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          >
             {/* Company header */}
             <motion.div
               className="flex items-center gap-3 mb-6"
@@ -249,7 +251,8 @@ const TimelineWorkHistory = () => {
             {/* Project cards - 3 columns */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {studio.apps.map((app, i) => {
-                const appIcon = `https://play-lh.googleusercontent.com/icon?id=${app.playStoreId}`;
+                const screenshots = getScreenshots(app.screenshots);
+                const canPreview = screenshots.length > 0;
                 return (
                   <motion.div
                     key={app.playStoreId}
@@ -264,7 +267,14 @@ const TimelineWorkHistory = () => {
                       boxShadow: "0 20px 60px hsl(141 73% 42% / 0.12), 0 0 0 1px hsl(141 73% 42% / 0.2)",
                     }}
                     transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                    className="bg-card rounded-xl border border-border overflow-hidden group relative flex flex-col"
+                    className={`bg-card rounded-xl border border-border overflow-hidden group relative flex flex-col ${
+                      canPreview ? "cursor-pointer" : ""
+                    }`}
+                    onClick={() => {
+                      if (!canPreview) return;
+                      setSelectedApp({ name: app.name, screenshots, technicalNote: app.technicalNote });
+                      setModalIdx(0);
+                    }}
                   >
                     <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -276,20 +286,23 @@ const TimelineWorkHistory = () => {
                       <h4 className="text-sm font-bold text-foreground mb-1 group-hover:text-primary transition-colors truncate">
                         {app.name}
                       </h4>
-                      <p className="text-[11px] text-muted-foreground mb-3">{app.category}</p>
-
-                      {app.tech && (
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {app.tech.split(" · ").map((t) => (
-                            <span
-                              key={t}
-                              className="text-[10px] px-2 py-0.5 rounded-md bg-primary/5 text-primary/80 border border-primary/10 font-medium"
-                            >
-                              {t}
-                            </span>
-                          ))}
-                        </div>
+                      <p className="text-[11px] text-muted-foreground mb-2">{app.category}</p>
+                      {app.technicalNote && (
+                        <p className="text-[11px] text-muted-foreground/90 leading-snug mb-3 line-clamp-4">
+                          {app.technicalNote}
+                        </p>
                       )}
+
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {app.skills.slice(0, 5).map((skill) => (
+                          <span
+                            key={skill}
+                            className="text-[10px] px-2 py-0.5 rounded-md bg-primary/5 text-primary/80 border border-primary/10 font-medium"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
 
                       <div className="mt-auto pt-2 border-t border-border/50">
                         <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
@@ -304,8 +317,105 @@ const TimelineWorkHistory = () => {
             </div>
           </motion.div>
         ))}
-      </motion.div>
-    </motion.section>
+      </div>
+      </motion.section>
+
+      <AnimatePresence>
+        {selectedApp && (
+          <motion.div
+            className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm p-4 md:p-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedApp(null)}
+          >
+            <div className="h-full w-full flex items-center justify-center">
+              <motion.div
+                className="relative w-full max-w-5xl"
+                initial={{ y: 20, opacity: 0, scale: 0.98 }}
+                animate={{ y: 0, opacity: 1, scale: 1 }}
+                exit={{ y: 10, opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.2 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  className="absolute -top-12 right-0 text-white/90 hover:text-white text-sm"
+                  onClick={() => setSelectedApp(null)}
+                >
+                  Close
+                </button>
+
+                <div className="relative rounded-xl overflow-hidden border border-white/20 bg-black">
+                  <img
+                    src={selectedApp.screenshots[modalIdx]}
+                    alt={`${selectedApp.name} preview ${modalIdx + 1}`}
+                    className="w-full max-h-[min(70vh,720px)] object-contain mx-auto"
+                  />
+                  {selectedApp.screenshots.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        aria-label="Previous image"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center z-10"
+                        onClick={() =>
+                          setModalIdx((prev) => (prev - 1 + selectedApp.screenshots.length) % selectedApp.screenshots.length)
+                        }
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Next image"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center z-10"
+                        onClick={() => setModalIdx((prev) => (prev + 1) % selectedApp.screenshots.length)}
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                <div className="mt-2 text-center space-y-2">
+                  <p className="text-xs text-white/70">
+                    {modalIdx + 1} / {selectedApp.screenshots.length}
+                  </p>
+                  {selectedApp.technicalNote && (
+                    <p className="text-xs text-white/60 max-w-2xl mx-auto leading-relaxed text-left px-1">
+                      <span className="text-white/40 font-medium uppercase tracking-wide text-[10px] block mb-1">
+                        Technical
+                      </span>
+                      {selectedApp.technicalNote}
+                    </p>
+                  )}
+                </div>
+
+                {/* All screenshots visible: scrollable thumbnail strip */}
+                <div className="mt-3 max-w-full overflow-x-auto pb-1">
+                  <div className="flex gap-2 min-w-0 justify-center flex-wrap sm:flex-nowrap sm:justify-start">
+                    {selectedApp.screenshots.map((src, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setModalIdx(idx)}
+                        className={`shrink-0 rounded-lg overflow-hidden border-2 transition-all w-20 h-20 sm:w-24 sm:h-24 ${
+                          idx === modalIdx ? "border-primary ring-2 ring-primary/40" : "border-white/20 opacity-80 hover:opacity-100"
+                        }`}
+                      >
+                        <img
+                          src={src}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

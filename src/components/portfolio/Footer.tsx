@@ -11,7 +11,7 @@ const navLinks = [
 const stats = [
   { value: "12+", label: "Years" },
   { value: "6", label: "Studios" },
-  { value: "24+", label: "Apps" },
+  { value: "23+", label: "Apps" },
   { value: "3", label: "Languages" },
 ];
 
