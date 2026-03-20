@@ -1,0 +1,198 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 100%;
+
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 141 73% 42%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 141 73% 52%;
+
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 70%;
+
+    --accent: 0 0% 14%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 141 73% 42%;
+
+    --radius: 0.75rem;
+
+    --surface: 0 0% 9%;
+    --surface-highlight: 0 0% 14%;
+    --text-muted: 0 0% 70%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.04em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+}
+
+/* Spotify-style scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 30%);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(0 0% 40%);
+}
+
+/* Modern glow & gradient utilities */
+@layer utilities {
+  .glow-primary {
+    box-shadow: 0 0 20px hsl(141 73% 42% / 0.15), 0 0 60px hsl(141 73% 42% / 0.08);
+  }
+
+  .glow-primary-strong {
+    box-shadow: 0 0 30px hsl(141 73% 42% / 0.25), 0 0 80px hsl(141 73% 42% / 0.12);
+  }
+
+  .gradient-border {
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(141 73% 42% / 0.4), transparent 60%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .glass {
+    background: hsl(0 0% 100% / 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(0 0% 100%), hsl(141 73% 52%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* Stripe-inspired animated gradient background */
+@keyframes stripe-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.stripe-bg {
+  background: linear-gradient(
+    135deg,
+    hsl(0 0% 7%) 0%,
+    hsl(240 20% 10%) 15%,
+    hsl(280 25% 9%) 30%,
+    hsl(200 30% 8%) 50%,
+    hsl(160 25% 8%) 70%,
+    hsl(220 20% 9%) 85%,
+    hsl(0 0% 7%) 100%
+  );
+  background-size: 400% 400%;
+  animation: stripe-gradient 20s ease infinite;
+}
+
+/* Animated background mesh */
+@keyframes mesh-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Fluid button interactions */
+@layer utilities {
+  .btn-fluid {
+    @apply transition-all duration-200 ease-out;
+  }
+  .btn-fluid:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px hsl(141 73% 42% / 0.2);
+  }
+  .btn-fluid:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 2px 8px hsl(141 73% 42% / 0.1);
+    transition-duration: 80ms;
+  }
+}
+
+/* Stripe-style skill card background */
+.stripe-bg-card {
+  background:
+    linear-gradient(
+      135deg,
+      hsl(0 0% 9%) 0%,
+      hsl(240 10% 10%) 25%,
+      hsl(200 12% 9%) 50%,
+      hsl(160 10% 9%) 75%,
+      hsl(0 0% 9%) 100%
+    );
+  background-size: 200% 200%;
+  animation: stripe-gradient 12s ease infinite;
+}
