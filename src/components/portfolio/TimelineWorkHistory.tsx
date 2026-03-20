@@ -150,19 +150,21 @@ const TimelineWorkHistory = () => {
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
         className="mb-16"
       >
-        <div className="relative flex flex-col items-center">
+        <div className="relative flex flex-col items-center w-full max-w-3xl mx-auto px-2 sm:px-0">
           {/* Vertical trunk line */}
           <div className="absolute left-1/2 -translate-x-px top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/60 via-primary/30 to-border" />
 
-          {orderedStudios.map((studio, i) => (
+          {orderedStudios.map((studio, i) => {
+            const isLeft = i % 2 === 0;
+            return (
             <motion.div
               key={studio.id}
-              initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
+              initial={{ opacity: 0, x: isLeft ? -30 : 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] as const }}
-              className={`relative flex items-center w-full max-w-xl mb-3 ${
-                i % 2 === 0 ? "flex-row" : "flex-row-reverse"
+              className={`relative flex items-center w-full mb-3 ${
+                isLeft ? "flex-row" : "flex-row-reverse"
               }`}
             >
               {/* Node */}
@@ -172,16 +174,16 @@ const TimelineWorkHistory = () => {
 
               {/* Branch line */}
               <div
-                className={`absolute top-1/2 -translate-y-px h-px bg-primary/30 w-8 ${
-                  i % 2 === 0 ? "right-[calc(50%+6px)]" : "left-[calc(50%+6px)]"
+                className={`absolute top-1/2 -translate-y-px h-px bg-primary/30 w-6 sm:w-8 ${
+                  isLeft ? "right-[calc(50%+6px)]" : "left-[calc(50%+6px)]"
                 }`}
               />
 
-              {/* Company chip */}
+              {/* Company chip — full names + years on separate line so nothing truncates or breaks mid-date */}
               <div
                 className={`${
-                  i % 2 === 0 ? "mr-auto pr-4 text-right" : "ml-auto pl-4 text-left"
-                } w-[calc(50%-24px)]`}
+                  isLeft ? "mr-auto pr-2 sm:pr-4" : "ml-auto pl-2 sm:pl-4"
+                } w-[calc(50%-20px)] sm:w-[calc(50%-28px)] min-w-0 max-w-[min(100%,20rem)] sm:max-w-none`}
               >
                 <a
                   href={`#company-${studio.id}`}
@@ -189,15 +191,28 @@ const TimelineWorkHistory = () => {
                     e.preventDefault();
                     document.getElementById(`company-${studio.id}`)?.scrollIntoView({ behavior: "smooth" });
                   }}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-border hover:border-primary/40 hover:bg-primary/5 transition-all text-xs font-medium text-foreground group cursor-pointer"
+                  className={`flex flex-col gap-1 px-3 py-2 rounded-lg bg-card border border-border hover:border-primary/40 hover:bg-primary/5 transition-all text-xs font-medium text-foreground group cursor-pointer ${
+                    isLeft ? "items-end text-right" : "items-start text-left"
+                  }`}
                 >
-                  <Building2 className="w-3 h-3 text-primary" />
-                  <span className="truncate">{studio.name}</span>
-                  <span className="text-muted-foreground text-[10px]">{studio.years}</span>
+                  <span
+                    className={`flex items-start gap-2 w-full ${
+                      isLeft ? "flex-row-reverse justify-end" : ""
+                    }`}
+                  >
+                    <Building2 className="w-3 h-3 text-primary shrink-0 mt-0.5" />
+                    <span className="leading-snug break-words [overflow-wrap:anywhere]">
+                      {studio.name}
+                    </span>
+                  </span>
+                  <span className="text-muted-foreground text-[10px] tracking-tight whitespace-nowrap tabular-nums">
+                    {studio.years}
+                  </span>
                 </a>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
 
           {/* Arrow at bottom */}
           <motion.div
