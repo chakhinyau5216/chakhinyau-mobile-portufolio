@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Code2, Smartphone, Database, Cloud, TestTube, Wrench } from "lucide-react";
+import { Code2, Smartphone, Database, Cloud, TestTube, Wrench, Gamepad2 } from "lucide-react";
 
 const skillCategories = [
   {
@@ -24,6 +24,16 @@ const skillCategories = [
       { name: "Swift", years: "5 years" },
       { name: "Dart", years: "7 years" },
       { name: "Python", years: "5 years" },
+    ],
+  },
+  {
+    title: "Game Development",
+    icon: Gamepad2,
+    skills: [
+      { name: "Unity 3D", years: "6 years" },
+      { name: "C# (Unity / .NET)", years: "6 years" },
+      { name: "2D & 3D scenes & prefabs", years: "6 years" },
+      { name: "Physics, animation & UI", years: "5 years" },
     ],
   },
   {
@@ -77,10 +87,16 @@ const skillCategories = [
 
 const SkillsSection = () => {
   const featuredCategories = skillCategories.filter(
-    (cat) => cat.title === "Mobile Development" || cat.title === "Languages & Frameworks",
+    (cat) =>
+      cat.title === "Mobile Development" ||
+      cat.title === "Languages & Frameworks" ||
+      cat.title === "Game Development",
   );
   const otherCategories = skillCategories.filter(
-    (cat) => cat.title !== "Mobile Development" && cat.title !== "Languages & Frameworks",
+    (cat) =>
+      cat.title !== "Mobile Development" &&
+      cat.title !== "Languages & Frameworks" &&
+      cat.title !== "Game Development",
   );
 
   return (
@@ -101,11 +117,11 @@ const SkillsSection = () => {
           Technical Skills
         </motion.h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Mobile-first expertise with deep Android and framework knowledge.
+          Mobile-first expertise, Android, cross-platform, and Unity game development.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
         {featuredCategories.map((cat, i) => (
           <motion.div
             key={cat.title}

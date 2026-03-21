@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, Calendar, Smartphone, ChevronDown, ChevronLeft, ChevronRight, Images } from "lucide-react";
-import { studios } from "@/data/portfolio";
+import { studios, profile } from "@/data/portfolio";
 import { getScreenshots } from "@/data/appScreenshots";
 
 // Order matches `studios` in portfolio: (1) Unicorn → (2) HKTDC → (3) Joynow → …
@@ -137,8 +137,12 @@ const TimelineWorkHistory = () => {
         >
           Work History
         </motion.h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          6 studios · 12 years · 23+ published apps
+        <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto px-2">
+          6 studios · {profile.totalYears} years ·{" "}
+          <span className="text-foreground/90 font-medium">{profile.workHistoryAppsCount} apps</span> highlighted
+          below ·{" "}
+          <span className="text-foreground/90 font-medium">{profile.totalApps}+</span> mobile products delivered
+          overall
         </p>
       </div>
 

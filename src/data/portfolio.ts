@@ -105,10 +105,13 @@ export const profile = {
   location: "Hong Kong",
   university: "The Chinese University of Hong Kong (CUHK)",
   languages: ["English", "中文", "日本語"],
-  headline: "12 Years. 6 Studios. 20+ Global Products.",
+  headline: "12 Years. 6 Studios. 50+ Mobile Products.",
   subheadline: "Senior Mobile Developer based in Hong Kong. CUHK Alumnus. Expert in the full mobile lifecycle from Unicorn Studio to OctopusX.",
   bio: "Trilingual engineer (English, Chinese, Japanese) specializing in high-scale Android and Cross-platform architectures. 12 years of delivering robust codebases for finance, media, and gaming.",
   certifications: ["Google Associate Android Developer", "Google Certified App Developer"],
   totalYears: 12,
-  totalApps: 23,
+  /** Total mobile apps / products shipped over career (portfolio marketing figure) */
+  totalApps: 50,
+  /** Apps with full cards & screenshots in Work History */
+  workHistoryAppsCount: 23,
 };

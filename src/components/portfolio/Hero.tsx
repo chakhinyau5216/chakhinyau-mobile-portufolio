@@ -141,7 +141,7 @@ const Hero = () => {
           {[
             { value: profile.totalYears, label: "Years" },
             { value: 6, label: "Studios" },
-            { value: `${profile.totalApps}+`, label: "Apps" },
+            { value: `${profile.totalApps}+`, label: "Products" },
           ].map(({ value, label }) => (
             <motion.div
               key={label}

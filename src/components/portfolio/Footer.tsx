@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { MapPin, Smartphone, ArrowUpRight } from "lucide-react";
+import { profile } from "@/data/portfolio";
 
 const navLinks = [
   { label: "Skills", href: "#skills" },
@@ -11,7 +12,7 @@ const navLinks = [
 const stats = [
   { value: "12+", label: "Years" },
   { value: "6", label: "Studios" },
-  { value: "23+", label: "Apps" },
+  { value: `${profile.totalApps}+`, label: "Apps shipped" },
   { value: "3", label: "Languages" },
 ];
 
