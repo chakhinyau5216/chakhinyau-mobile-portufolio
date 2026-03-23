@@ -114,4 +114,7 @@ export const profile = {
   totalApps: 50,
   /** Apps with full cards & screenshots in Work History */
   workHistoryAppsCount: 23,
+  /** Figma design portfolio (UI/UX work) */
+  figmaPortfolioUrl:
+    "https://www.figma.com/design/9bKBKiSGkSPFXqP5p3xN0f/Chak-Hin-Yau--s-Portfolio?node-id=0-1&t=HHcUwSjkOxIxTJ75-1",
 };

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MapPin, GraduationCap, Award, Smartphone } from "lucide-react";
+import { MapPin, GraduationCap, Award, Smartphone, ExternalLink } from "lucide-react";
 import { profile } from "@/data/portfolio";
 import profileImg from "@/assets/profile.png";
 
@@ -97,6 +97,38 @@ const Hero = () => {
             12 years building high-scale Android, iOS & Cross-platform apps.
             Trilingual engineer delivering robust mobile products for finance, media, and gaming.
           </p>
+        </motion.div>
+
+        {/* Figma design portfolio — gradient frame inspired by Figma brand colors */}
+        <motion.div variants={itemVariants} className="mt-8 flex justify-center">
+          <motion.a
+            href={profile.figmaPortfolioUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.035, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 400, damping: 22 }}
+            className="group relative inline-flex rounded-full p-[1px] shadow-[0_0_48px_-10px_hsl(280_55%_45%/0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            style={{
+              background:
+                "linear-gradient(120deg, #A259FF 0%, #F24E1E 45%, #0ACF83 85%, #1ABCFE 100%)",
+            }}
+            aria-label="Open Figma design portfolio in a new tab"
+          >
+            <span className="flex items-center gap-2.5 rounded-full bg-background/95 px-5 py-2.5 md:px-6 md:py-3 text-sm font-semibold text-foreground backdrop-blur-sm transition-colors group-hover:bg-background">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#2C2C2C] shadow-inner" aria-hidden>
+                <svg viewBox="0 0 24 24" className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                  <path fill="#0ACF83" d="M8 24c2.208 0 4-1.792 4-4v-4H8c-2.208 0-4 1.792-4 4s1.792 4 4 4z" />
+                  <path fill="#A259FF" d="M8 16h4V8H8c-2.208 0-4 1.792-4 4s1.792 4 4 4z" />
+                  <path fill="#F24E1E" d="M8 8h4V0H8c-2.208 0-4 1.792-4 4s1.792 4 4 4z" />
+                  <path fill="#FF7262" d="M16 8h4c0-2.208-1.792-4-4-4S12 5.792 12 8v4h4z" />
+                  <path fill="#1ABCFE" d="M12 16h4c2.208 0 4-1.792 4-4s-1.792-4-4-4h-4v8z" />
+                </svg>
+              </span>
+              <span className="tracking-tight">Figma portfolio</span>
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-primary" />
+            </span>
+          </motion.a>
         </motion.div>
 
         {/* Meta info */}
